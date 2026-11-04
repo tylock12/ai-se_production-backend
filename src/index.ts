@@ -6,10 +6,15 @@ import mongoose from 'mongoose';
 import noteRoutes from './routes/notes.js';
 import authRouter from './routes/auth.js';
 import { errorHandler, notFoundHandler } from './middleware/error.js';
+import cors from "cors";
+import { requestLogger } from "./middleware/logger.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const isProduction = process.env.NODE_ENV === 'production';
 
+app.use(requestLogger);
+app.use(cors({ origin: process.env.CLIENT_ORIGIN }));
 app.use(express.json());
 app.use(noteRoutes);
 app.use(authRouter);
@@ -22,7 +27,11 @@ mongoose
   .then(() => {
     console.log('MongoDB connected');
     app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
+        if (isProduction) {
+             console.log(JSON.stringify({ event: 'server_start', port: PORT, env: process.env.NODE_ENV }))
+        } else {
+          console.log(`[dev] Server running at http://localhost:${PORT}`)
+        }
     });
   })
   .catch((err) => {
