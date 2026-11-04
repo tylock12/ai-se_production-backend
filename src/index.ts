@@ -6,12 +6,12 @@ import mongoose from 'mongoose';
 import noteRoutes from './routes/notes.js';
 import authRouter from './routes/auth.js';
 import { errorHandler, notFoundHandler } from './middleware/error.js';
-import cors from "cors";
-import { requestLogger } from "./middleware/logger.js";
+import cors from 'cors';
+import { requestLogger } from './middleware/logger.js';
+import { logger } from './utils/logger.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const isProduction = process.env.NODE_ENV === 'production';
 
 app.use(requestLogger);
 app.use(cors({ origin: process.env.CLIENT_ORIGIN }));
@@ -27,11 +27,7 @@ mongoose
   .then(() => {
     console.log('MongoDB connected');
     app.listen(PORT, () => {
-        if (isProduction) {
-             console.log(JSON.stringify({ event: 'server_start', port: PORT, env: process.env.NODE_ENV }))
-        } else {
-          console.log(`[dev] Server running at http://localhost:${PORT}`)
-        }
+      logger.info('Server started', { port: PORT, env: process.env.NODE_ENV });
     });
   })
   .catch((err) => {

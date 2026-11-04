@@ -1,6 +1,7 @@
 import morgan from 'morgan';
 import { Request } from "express";
 
+
 const isProduction = process.env.NODE_ENV === "production";
 
 morgan.token('user-id', (req) => (req as Request) .user?.userId ?? "anonymous");
